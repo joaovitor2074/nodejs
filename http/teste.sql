@@ -1,1 +1,0 @@
-update usuarios set nome = "jvzinn" where idade = 16;

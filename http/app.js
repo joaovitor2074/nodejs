@@ -1,28 +1,48 @@
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
+import { engine } from "express-handlebars";
+import bodyParser from "body-parser";
+
+const app = express()
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express();
+//config
+    //template engine
+    app.engine('handlebars', engine())
+    app.set('view engine', 'handlebars')
+    app.set('views', path.join(__dirname, 'views'))
 
-app.get("/", (req, res) => {
-    res.sendFile(__dirname + "/html/index.html")
-});
+    //mysql 
+    import Sequelize from 'sequelize'
+    const sequelize = new Sequelize('jv','root','',{
+        host: "localhost",
+        dialect: 'mysql'
+    })
 
-app.get("/sobre", (req, res) => {
-    res.sendFile(__dirname + "/html/sobra.html");
-});
+    //body parser
+    app.use(bodyParser.urlencoded({extended: false}))
+    app.use(bodyParser.json())
 
-app.get("/blog", (req, res) => {
-    res.send("bem vindo ao meu blog");
-});
 
-app.get("/ola/:nome/:cargo", (req, res) => {
-    res.send("ola " + req.params.nome + "<br/> seu cargo: " + req.params.cargo);
-});
+//rotas
+    app.get("/jv",(req,res)=>{
+        res.send("Hello World")
+    })
 
-app.listen(2074, () => {
-    console.log("servidor rodando");
-});
+    app.post("/add", (req,res)=>{
+        req.body.titulo
+        res.send("texto " + req.body.titulo + " conteudo " + req.body.conteudo)
+    })
+
+    app.get('/',(req,res)=>{
+        res.render('formulario', {titulo: "Bem-vindo", subtitulo: "Teste"})
+    })
+
+
+app.listen(2074, ()=>{console.log("servidor rodando")})
+
+
