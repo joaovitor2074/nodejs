@@ -17,11 +17,6 @@ const __dirname = path.dirname(__filename);
     app.set('views', path.join(__dirname, 'views'))
 
     //mysql 
-    import Sequelize from 'sequelize'
-    const sequelize = new Sequelize('jv','root','',{
-        host: "localhost",
-        dialect: 'mysql'
-    })
 
     //body parser
     app.use(bodyParser.urlencoded({extended: false}))

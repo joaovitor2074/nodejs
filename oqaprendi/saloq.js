@@ -1,49 +1,54 @@
-import express from "express";
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { engine } from 'express-handlebars';
-// Não é mais necessário importar o body-parser se você usar express diretamente
-// import bodyParser from "body-parser";
-import Sequelize from 'sequelize';
+import express from 'express'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import { create } from 'express-handlebars' // Correção aqui!
+import { Sequelize } from 'sequelize'
 
-const app = express();
+const app = express()
 
-// Configurar diretórios e paths
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 // Conexão com o banco de dados
-const sequelize = new Sequelize('jv', 'root', '', {
+const sequelize = new Sequelize("jv", "root", "", {
     host: "localhost",
-    dialect: 'mysql'
-});
+    dialect: "mysql"
+})
 
-// Testar a conexão com o banco
+// Teste de conexão ao banco
 sequelize.authenticate()
-    .then(() => console.log("Conectado ao banco de dados!"))
-    .catch((err) => console.error("Erro de conexão:", err));
+    .then(() => console.log("Conexão bem-sucedida com o banco de dados!"))
+    .catch(err => console.error("Erro ao conectar ao banco:", err))
 
 // Configuração do Handlebars
-app.engine("handlebars", engine());
-app.set("view engine", "handlebars");
-app.set("views", path.join(__dirname, "views"));
-app.use(express.static(path.join(__dirname, "public")));
+const hbs = create({
+    defaultLayout: false
+})
 
-// Usar as funções do express para parsing
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+app.engine('handlebars', hbs.engine)
+app.set('view engine', 'handlebars')
+app.set('views', path.join(__dirname, 'views'))
+
+// Middleware para processar JSON e dados de formulário
+app.use(express.urlencoded({ extended: false }))
+app.use(express.json())
 
 // Rota principal
-app.get('/', (req, res) => {
-    res.render("home", { titulo: "Bem-vindo", subtitulo: "Teste" });
-});
+app.get("/", (req, res) => {
+    res.render("home", { titulo: "Bem-vindo", subtitulo: "Teste" })
+})
 
-// Rota para testar o envio de dados via POST
+// Rota POST para adicionar dados
 app.post("/slaoq", (req, res) => {
-    res.send(`Nome: ${req.body.nome} | Sobrenome: ${req.body.sobrenome}`);
-});
+    const { nome, sobrenome} = req.body // Correção aqui!
+    if (!nome || !sobrenome) {
+        return res.status(400).send("Erro: Campos título e conteúdo são obrigatórios!")
+    }
+    res.send(`Texto: ${nome} | Conteúdo: ${sobrenome}`)
+})
 
-// Iniciar servidor
-app.listen(2074, () => {
-    console.log("Servidor rodando na porta 2074! 🚀");
-});
+// Inicialização do servidor
+const PORT = 2074
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`)
+})
