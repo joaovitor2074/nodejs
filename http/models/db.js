@@ -7,3 +7,4 @@ const sequelize = new Sequelize("postagens", "root", "", {
 });
 
 export { Sequelize, sequelize };
+
